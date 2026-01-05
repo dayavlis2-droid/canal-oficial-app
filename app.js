@@ -157,35 +157,39 @@ export default function App() {
 
   // --- LAYOUTS ---
   
-  // MODO CLIENTE / LOGIN (Responsivo Ajustado)
+  // MODO CLIENTE / LOGIN
   if (!isProLoggedIn) {
       return (
-          // CORREÇÃO AQUI: h-[100dvh] para celular e md:p-4 para desktop
-          <div className="h-[100dvh] w-full bg-gray-50 flex items-center justify-center md:p-4">
-              <div className="w-full h-full md:max-w-md md:h-[85vh] bg-white md:shadow-xl md:rounded-2xl overflow-hidden md:border border-gray-100 relative flex flex-col">
-                  {currentScreen === 'login' && (
-                      <div className="h-full relative flex flex-col">
-                          <AuthScreen onLogin={handleLogin} businessProfile={businessProfile} />
-                          <div className="absolute bottom-6 left-0 right-0 text-center z-10"><button onClick={() => setCurrentScreen('client_landing')} className="text-xs text-gray-400 underline">Modo Demo Cliente</button></div>
-                      </div>
-                  )}
-                  {currentScreen === 'client_landing' && <ClientLandingScreen businessProfile={businessProfile} onStartChat={handleClientStart} onGoToCatalog={handleClientGoToCatalog} />}
-                  {currentScreen === 'client_catalog' && <ClientCatalogScreen catalog={catalog} onSendOrder={handleSendOrder} setCurrentScreen={setCurrentScreen} />}
-                  {(currentUserId && currentUserId !== 'pro1' && currentScreen === 'chat') && 
-                      <ChatScreen messages={messages} currentUser={currentUser} businessProfile={businessProfile} clientDb={clientDb} sendMessage={sendMessage} downloadCombinadoPDF={downloadCombinadoPDF} setCurrentScreen={setCurrentScreen} />
-                  }
+          // CORREÇÃO: "fixed inset-0" obriga a ficar preso na tela do celular sem rolar o fundo
+          <div className="fixed inset-0 w-full bg-gray-50 flex items-center justify-center md:static md:h-screen md:p-4">
+              <div className="w-full h-full flex flex-col bg-white md:max-w-md md:h-[85vh] md:shadow-xl md:rounded-2xl md:border border-gray-100 overflow-hidden relative">
+                  
+                  {/* Container Flexível para o Conteúdo */}
+                  <div className="flex-1 overflow-hidden relative flex flex-col">
+                    {currentScreen === 'login' && (
+                        <div className="h-full relative flex flex-col overflow-y-auto">
+                            <AuthScreen onLogin={handleLogin} businessProfile={businessProfile} />
+                            <div className="py-4 text-center shrink-0"><button onClick={() => setCurrentScreen('client_landing')} className="text-xs text-gray-400 underline">Modo Demo Cliente</button></div>
+                        </div>
+                    )}
+                    {currentScreen === 'client_landing' && <ClientLandingScreen businessProfile={businessProfile} onStartChat={handleClientStart} onGoToCatalog={handleClientGoToCatalog} />}
+                    {currentScreen === 'client_catalog' && <ClientCatalogScreen catalog={catalog} onSendOrder={handleSendOrder} setCurrentScreen={setCurrentScreen} />}
+                    {(currentUserId && currentUserId !== 'pro1' && currentScreen === 'chat') && 
+                        <ChatScreen messages={messages} currentUser={currentUser} businessProfile={businessProfile} clientDb={clientDb} sendMessage={sendMessage} downloadCombinadoPDF={downloadCombinadoPDF} setCurrentScreen={setCurrentScreen} />
+                    }
+                  </div>
               </div>
           </div>
       );
   }
 
-  // Layout Profissional (Full Screen)
+  // Layout Profissional (Full Screen Desktop / Mobile)
   return (
-    <div className="h-[100dvh] bg-slate-100 flex overflow-hidden">
+    <div className="fixed inset-0 bg-slate-100 flex overflow-hidden">
         <div className={`
             flex-col bg-white border-r border-gray-200 z-10 transition-all duration-300
             ${currentScreen === 'home' ? 'flex w-full' : 'hidden md:flex'} 
-            md:w-1/3 lg:w-1/4 md:min-w-[320px]
+            md:w-1/3 lg:w-1/4 md:min-w-[320px] h-full
         `}>
             <HomeScreen 
                 currentUser={currentUser} 
@@ -202,7 +206,7 @@ export default function App() {
         </div>
 
         <div className={`
-            flex-1 bg-slate-50 relative flex-col
+            flex-1 bg-slate-50 relative flex-col h-full
             ${currentScreen === 'home' ? 'hidden md:flex' : 'flex w-full'}
         `}>
             {currentScreen === 'home' ? (
@@ -214,7 +218,7 @@ export default function App() {
                     <p className="text-sm mt-2">Gerencie seus atendimentos e orçamentos por aqui.</p>
                 </div>
             ) : (
-                <div className="h-full w-full max-w-5xl mx-auto bg-white shadow-sm md:border-x border-gray-100 md:my-0">
+                <div className="h-full w-full max-w-5xl mx-auto bg-white shadow-sm md:border-x border-gray-100 md:my-0 flex flex-col overflow-hidden">
                     {renderScreen()}
                 </div>
             )}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Package } from 'lucide-react';
-import ResponsiveModal from './ResponsiveModal'; // Importando o novo modal
+import ResponsiveModal from './ResponsiveModal'; // <--- O NOVO MODAL
 
 const ProCatalogScreen = ({ catalog, setCatalog, setCurrentScreen }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -71,7 +71,7 @@ const ProCatalogScreen = ({ catalog, setCatalog, setCurrentScreen }) => {
                 )}
             </div>
 
-            {/* --- MODAL DE EDIÇÃO (Usando Componente Padrão) --- */}
+            {/* --- MODAL DE EDIÇÃO (ResponsiveModal) --- */}
             <ResponsiveModal
                 isOpen={isEditing}
                 onClose={() => setIsEditing(false)}

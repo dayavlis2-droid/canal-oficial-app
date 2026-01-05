@@ -1,117 +1,131 @@
-import React, { useState, useRef } from 'react';
-import { ChevronLeft, ImageIcon, Trash2, Camera, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Edit2, Trash2, Package } from 'lucide-react';
+import ResponsiveModal from './ResponsiveModal'; // Importando o novo modal
 
 const ProCatalogScreen = ({ catalog, setCatalog, setCurrentScreen }) => {
-    const [newItem, setNewItem] = useState({});
-    const [isAdding, setIsAdding] = useState(false);
-    const fileInputRef = useRef(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentItem, setCurrentItem] = useState(null);
 
-    const handleAddItem = () => {
-        if(!newItem.title || !newItem.price) return;
-        const item = {
-            id: Date.now().toString(),
-            title: newItem.title,
-            price: Number(newItem.price),
-            description: newItem.description || '',
-            image: newItem.image
-        };
-        setCatalog([...catalog, item]);
-        setNewItem({});
-        setIsAdding(false);
+    const handleSaveItem = () => {
+        if (!currentItem.title || !currentItem.price) return;
+
+        if (currentItem.id) {
+            // Editar
+            setCatalog(catalog.map(i => i.id === currentItem.id ? currentItem : i));
+        } else {
+            // Criar
+            setCatalog([...catalog, { ...currentItem, id: Date.now().toString() }]);
+        }
+        setIsEditing(false);
+        setCurrentItem(null);
     };
 
     const handleDelete = (id) => {
-        setCatalog(catalog.filter(i => i.id !== id));
-    };
-
-    const handleImageUpload = (e) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                setNewItem({ ...newItem, image: ev.target?.result });
-            };
-            reader.readAsDataURL(file);
+        if (window.confirm("Tem certeza que deseja excluir?")) {
+            setCatalog(catalog.filter(i => i.id !== id));
         }
     };
 
+    const openModal = (item = { title: '', price: '', description: '' }) => {
+        setCurrentItem(item);
+        setIsEditing(true);
+    };
+
     return (
-        <div className="flex flex-col h-full bg-slate-50">
-            <header className="bg-white p-4 shadow-sm flex items-center gap-3 sticky top-0 z-10">
-                <button onClick={() => setCurrentScreen('home')} className="p-2 hover:bg-gray-100 rounded-full"><ChevronLeft className="text-slate-700"/></button>
-                <h2 className="font-bold text-lg text-slate-800">Gerenciar Catálogo</h2>
-            </header>
+        <div className="h-full flex flex-col bg-slate-50">
+            {/* Header */}
+            <div className="bg-white p-4 shadow-sm flex items-center justify-between sticky top-0 z-10">
+                 <div className="flex items-center gap-3">
+                     <button onClick={() => setCurrentScreen('home')} className="text-gray-600 font-bold text-sm">Voltar</button>
+                     <h2 className="font-bold text-lg text-[#005C99]">Gerenciar Catálogo</h2>
+                 </div>
+                 <button 
+                    onClick={() => openModal()}
+                    className="bg-[#005C99] text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-blue-800"
+                 >
+                    <Plus size={16}/> Novo Item
+                 </button>
+            </div>
 
-            <div className="p-4 flex-1 overflow-y-auto space-y-4">
-                {catalog.map((item) => (
-                    <div key={item.id} className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex gap-3 items-center">
-                        <div className="w-20 h-20 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
-                            {item.image ? <img src={item.image} className="w-full h-full object-cover"/> : <ImageIcon size={20} className="text-gray-400"/>}
-                        </div>
-                        <div className="flex-1">
-                            <h4 className="font-bold text-slate-800 text-sm">{item.title}</h4>
-                            <p className="text-xs text-gray-500 truncate mt-1">{item.description}</p>
-                            <p className="font-bold text-[#005C99] mt-2 text-sm">R$ {item.price.toFixed(2)}</p>
-                        </div>
-                        <button onClick={() => handleDelete(item.id)} className="p-2 text-red-400 hover:bg-red-50 rounded-full">
-                            <Trash2 size={18}/>
-                        </button>
-                    </div>
-                ))}
-
-                {isAdding ? (
-                    <div className="bg-white p-5 rounded-2xl shadow-lg border border-gray-100 animate-slide-up">
-                        <h4 className="font-bold text-sm mb-4 text-slate-800">Novo Item</h4>
-                        <div className="space-y-3">
-                            <div 
-                                className="w-full h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors"
-                                onClick={() => fileInputRef.current?.click()}
-                            >
-                                {newItem.image ? (
-                                    <img src={newItem.image} className="w-full h-full object-cover rounded-xl" />
-                                ) : (
-                                    <>
-                                        <Camera size={24} className="text-gray-400 mb-1"/>
-                                        <span className="text-xs text-gray-400 font-medium">Adicionar Foto</span>
-                                    </>
-                                )}
-                            </div>
-                            <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload}/>
-                            
-                            <input 
-                                placeholder="Nome do produto" 
-                                className="w-full p-3 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#005C99]"
-                                value={newItem.title || ''}
-                                onChange={e => setNewItem({...newItem, title: e.target.value})}
-                            />
-                            <input 
-                                placeholder="Preço (R$)" 
-                                type="number"
-                                className="w-full p-3 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#005C99]"
-                                value={newItem.price || ''}
-                                onChange={e => setNewItem({...newItem, price: Number(e.target.value)})}
-                            />
-                            <textarea 
-                                placeholder="Descrição" 
-                                className="w-full p-3 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#005C99]"
-                                value={newItem.description || ''}
-                                onChange={e => setNewItem({...newItem, description: e.target.value})}
-                            />
-                            <div className="flex gap-2 pt-2">
-                                <button onClick={() => setIsAdding(false)} className="flex-1 py-3 text-gray-500 text-sm font-bold bg-gray-100 rounded-xl hover:bg-gray-200">Cancelar</button>
-                                <button onClick={handleAddItem} className="flex-1 py-3 bg-[#005C99] text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-900/20 hover:bg-blue-800">Salvar Item</button>
-                            </div>
-                        </div>
+            {/* Lista */}
+            <div className="p-4 space-y-3 overflow-y-auto pb-20">
+                {catalog.length === 0 ? (
+                    <div className="text-center py-20 text-gray-400">
+                        <Package size={48} className="mx-auto mb-4 opacity-30"/>
+                        <p>Nenhum item cadastrado.</p>
                     </div>
                 ) : (
-                    <button 
-                        onClick={() => setIsAdding(true)}
-                        className="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold flex items-center justify-center gap-2 hover:border-[#005C99] hover:text-[#005C99] hover:bg-blue-50 transition-all"
-                    >
-                        <Plus size={20}/> Adicionar Item ao Catálogo
-                    </button>
+                    catalog.map(item => (
+                        <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center group">
+                            <div>
+                                <h3 className="font-bold text-gray-800">{item.title}</h3>
+                                <p className="text-sm text-gray-500">{item.description}</p>
+                                <p className="text-[#005C99] font-bold mt-1">R$ {parseFloat(item.price).toFixed(2)}</p>
+                            </div>
+                            <div className="flex gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => openModal(item)} className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"><Edit2 size={16}/></button>
+                                <button onClick={() => handleDelete(item.id)} className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100"><Trash2 size={16}/></button>
+                            </div>
+                        </div>
+                    ))
                 )}
             </div>
+
+            {/* --- MODAL DE EDIÇÃO (Usando Componente Padrão) --- */}
+            <ResponsiveModal
+                isOpen={isEditing}
+                onClose={() => setIsEditing(false)}
+                title={currentItem?.id ? "Editar Item" : "Novo Serviço/Produto"}
+                footer={
+                    <div className="flex w-full gap-3">
+                        <button 
+                            onClick={() => setIsEditing(false)}
+                            className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl"
+                        >
+                            Cancelar
+                        </button>
+                        <button 
+                            onClick={handleSaveItem}
+                            className="flex-1 bg-[#005C99] text-white py-3 rounded-xl font-bold hover:bg-blue-800"
+                        >
+                            Salvar Item
+                        </button>
+                    </div>
+                }
+            >
+                {currentItem && (
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-bold text-gray-600 mb-1">Título</label>
+                            <input 
+                                value={currentItem.title} 
+                                onChange={e => setCurrentItem({...currentItem, title: e.target.value})}
+                                className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" 
+                                placeholder="Ex: Consultoria"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-600 mb-1">Preço (R$)</label>
+                            <input 
+                                type="number"
+                                value={currentItem.price} 
+                                onChange={e => setCurrentItem({...currentItem, price: parseFloat(e.target.value)})}
+                                className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" 
+                                placeholder="0.00"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-600 mb-1">Descrição</label>
+                            <textarea 
+                                value={currentItem.description} 
+                                onChange={e => setCurrentItem({...currentItem, description: e.target.value})}
+                                className="w-full p-3 border rounded-xl h-24 focus:ring-2 focus:ring-blue-500 outline-none" 
+                                placeholder="Detalhes do serviço..."
+                            />
+                        </div>
+                    </div>
+                )}
+            </ResponsiveModal>
         </div>
     );
 };

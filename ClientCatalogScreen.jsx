@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { ShoppingBag, Plus, Minus, Send, Trash2 } from 'lucide-react';
-import ResponsiveModal from './ResponsiveModal'; // Importando o novo modal
+import ResponsiveModal from './ResponsiveModal'; // <--- O SEGREDO ESTÁ AQUI
 
 const ClientCatalogScreen = ({ catalog, onSendOrder, setCurrentScreen }) => {
     const [cart, setCart] = useState({});
     const [isCartOpen, setIsCartOpen] = useState(false);
 
-    // --- Lógica do Carrinho (Inalterada) ---
+    // --- Lógica do Carrinho ---
     const updateQuantity = (item, delta) => {
         setCart(prev => {
             const currentQty = prev[item.id]?.qty || 0;
@@ -80,7 +80,7 @@ const ClientCatalogScreen = ({ catalog, onSendOrder, setCurrentScreen }) => {
                 </div>
             )}
 
-            {/* --- MODAL DO CARRINHO (Usando Componente Padrão) --- */}
+            {/* --- MODAL DO CARRINHO (Agora usando ResponsiveModal) --- */}
             <ResponsiveModal
                 isOpen={isCartOpen}
                 onClose={() => setIsCartOpen(false)}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileText } from 'lucide-react';
-import ResponsiveModal from './ResponsiveModal'; // Importando o novo modal
+import ResponsiveModal from './ResponsiveModal'; // <--- O NOVO MODAL
 
 const CreateAcordoModal = ({ isOpen, onClose, onSend, clientName }) => {
     const [title, setTitle] = useState('');

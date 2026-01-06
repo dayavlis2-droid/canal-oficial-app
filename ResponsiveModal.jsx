@@ -7,41 +7,38 @@ const ResponsiveModal = ({
     title, 
     children, 
     footer, 
-    maxWidth = 'max-w-md' // Padrão médio, pode passar 'max-w-2xl' para maiores
+    maxWidth = 'max-w-md' 
 }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm p-0 md:p-4 transition-all duration-300">
-            {/* Container Principal do Modal 
-               Mobile: h-[100dvh] (ocupa toda altura visível), arredondamento zero
-               Desktop: Altura automática com limite, arredondado
-            */}
+        <div className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm transition-all duration-300">
+            {/* O SEGREDO: h-[100dvh] força a altura exata da tela visível no celular */}
             <div className={`
                 w-full h-[100dvh] md:h-auto md:max-h-[85vh] 
                 bg-white md:rounded-2xl shadow-2xl flex flex-col 
-                ${maxWidth} transition-all duration-300
+                ${maxWidth} overflow-hidden
             `}>
                 
-                {/* HEADER (Fixo) */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-100 shrink-0 bg-white md:rounded-t-2xl">
-                    <h3 className="font-bold text-lg text-gray-800">{title}</h3>
+                {/* HEADER - Agora com fundo azul para você ver que atualizou */}
+                <div className="flex items-center justify-between p-4 bg-[#005C99] text-white shrink-0 md:rounded-t-2xl">
+                    <h3 className="font-bold text-lg">{title}</h3>
                     <button 
                         onClick={onClose} 
-                        className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
+                        className="p-2 hover:bg-white/20 rounded-full text-white transition-colors"
                     >
-                        <X size={20} />
+                        <X size={24} />
                     </button>
                 </div>
 
-                {/* BODY (Rolagem) */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
+                {/* BODY - Flex-1 faz ele ocupar SÓ o espaço que sobra */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
                     {children}
                 </div>
 
-                {/* FOOTER (Fixo no fundo) */}
+                {/* FOOTER - Shrink-0 impede que ele seja esmagado */}
                 {footer && (
-                    <div className="p-4 border-t border-gray-100 bg-gray-50 shrink-0 md:rounded-b-2xl flex flex-col md:flex-row gap-3 justify-end items-center">
+                    <div className="p-4 border-t border-gray-200 bg-gray-50 shrink-0 md:rounded-b-2xl pb-safe">
                         {footer}
                     </div>
                 )}

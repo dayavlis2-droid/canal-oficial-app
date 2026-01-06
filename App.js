@@ -282,13 +282,11 @@ export default function App() {
                     {currentScreen === 'login' && (
                         <div className="h-full relative flex flex-col overflow-y-auto">
                             
-                            {/* AQUI ESTÁ O SEGREDO: Usamos o componente interno */}
+                            {/* --- LOGIN INTERNO SEGURO --- */}
                             <LoginInternal onLogin={handleLogin} />
 
-                            <div className="py-4 text-center shrink-0 bg-white absolute bottom-0 w-full">
-                                <button onClick={() => setCurrentScreen('client_landing')} className="text-xs text-gray-400 underline">
-                                    Modo Demo Cliente
-                                </button>
+                            <div className="py-4 text-center shrink-0 bg-white">
+                                <button onClick={() => setCurrentScreen('client_landing')} className="text-xs text-gray-400 underline">Modo Demo Cliente</button>
                             </div>
                         </div>
                     )}
